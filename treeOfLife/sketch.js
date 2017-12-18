@@ -1,19 +1,18 @@
 
 new p5();
 
-var tree;
 function setup(){
 	createCanvas(windowWidth, windowHeight);
-	tree = new Tree(100); 
 }
 
 function draw(){
 	background(0);
-	stroke(255);
 	translate(windowWidth/2,windowHeight);
-	//tree.grow();
-	grow(100);
+	//grow(100);
+	branch(0,80,windowHeight/5,-Math.PI/2,13,15);
+	noLoop();
 }
+
 function grow(len){
 	if('ontouchstart' in window){
 		var theta = map(touchX,0,windowWidth,0,Math.PI/2);
@@ -24,43 +23,57 @@ function grow(len){
 	line(0,0,0,-len);
 	translate(0,-len);
 	len *= 0.66;
+
 	if(len > 2){
 		push();
 		rotate(theta);
 		grow(len);
 		pop();
-
+	
 		push();
 		rotate(-theta);
 		grow(len);
 		pop();
 	}
 }
-class Tree{
-	constructor(len){
-		this.len = len;
-		this.theta = Math.PI/6;
-	}
 
-	grow(){
-		if('ontouchstart' in window){
-			this.theta = map(touchX,0,windowWidth,0,Math.PI/2);
-		}else{
-			this.theta = map(mouseX,0,windowWidth,0,Math.PI/2);
-		}
-		line(0,0,0,-this.len);
-		translate(0,-this.len);
-		this.len *= 0.66;
-		if(this.len > 2){
-			push();
-			rotate(this.theta);
-			this.grow(this.len);
-			pop();
-	
-			rotate(-this.theta);
-			this.grow(this.len);
-		}
+function branch(startX,startY,len,theta,depth,branchWidth){
+	var endX,endY;
+	if(depth <=3){
+		stroke('#27ae60');
+	}else{
+		stroke('#fff');
 	}
+	strokeWeight(len*0.03);
+	endX = startX + len*Math.cos(theta);
+	endY = startY + len*Math.sin(theta);
+	line(startX,startY,endX,endY);
+
+	//translate(0,0,len*Math.cos(theta),len*Math.sin(theta));
+	depth -= 1;
+	branchWidth *= 0.66;
+	if(!depth){
+		return;
+	}
+	for(var i=0; i<Math.random() * 3 + 1; i++){
+		len *= 0.66 + Math.random()*0.33;
+		theta += Math.PI/2*(Math.random() -0.5);
+		//push();
+		branch(endX,endY,len,theta,depth,branchWidth);
+		//pop();
+
+	}
+	
+}
+
+function mousePressed(){
+	background(0);
+	branch(0,80,windowHeight/5,-Math.PI/2,13,15);
+}
+
+function 	touchStarted(){
+	background(0);
+	branch(0,80,windowHeight/5,-Math.PI/2,13,15);
 }
 
 function windowResized() {
